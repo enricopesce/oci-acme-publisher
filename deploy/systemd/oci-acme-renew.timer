@@ -1,0 +1,13 @@
+[Unit]
+Description=Run OCI ACME renewal twice daily
+
+[Timer]
+OnCalendar=*-*-* 03:17:00 UTC
+OnCalendar=*-*-* 15:17:00 UTC
+RandomizedDelaySec=30min
+Persistent=true
+Unit=oci-acme-renew.service
+
+[Install]
+WantedBy=timers.target
+

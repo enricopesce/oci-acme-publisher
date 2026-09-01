@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Build the isolated application runtime from artifacts delivered by the RPM.
+set -euo pipefail
+
+runtime_dir=/opt/oci-acme-publisher/venv
+assets_dir=/usr/share/oci-acme-publisher
+python_binary=/usr/bin/python3
+
+if [ ! -x "$python_binary" ]; then
+  echo "python3 is required to initialize OCI ACME Publisher" >&2
+  exit 1
+fi
+if [ ! -d "$assets_dir/wheelhouse" ] || [ ! -f "$assets_dir/requirements.lock" ]; then
+  echo "packaged OCI ACME dependency artifacts are incomplete" >&2
+  exit 1
+fi
+
+new_runtime="${runtime_dir}.new"
+previous_runtime="${runtime_dir}.previous"
+rm -rf "$new_runtime" "$previous_runtime"
+"$python_binary" -m venv "$new_runtime"
+"$new_runtime/bin/pip" install --no-index --find-links "$assets_dir/wheelhouse" \
+  --require-hashes -r "$assets_dir/requirements.lock"
+"$new_runtime/bin/pip" install --no-index --find-links "$assets_dir/wheelhouse" --no-deps \
+  "$assets_dir/wheelhouse"/oci_acme_certificate_publisher-*.whl
+# Console-script shebangs are written with the temporary venv path.  Rewrite
+# them before the atomic directory swap so their interpreter remains valid.
+find "$new_runtime/bin" -maxdepth 1 -type f -exec \
+  sed -i "1s|$new_runtime|$runtime_dir|" {} +
+if [ -d "$runtime_dir" ]; then
+  mv "$runtime_dir" "$previous_runtime"
+fi
+mv "$new_runtime" "$runtime_dir"
+rm -rf "$previous_runtime"

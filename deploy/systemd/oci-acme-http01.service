@@ -1,0 +1,38 @@
+[Unit]
+Description=OCI ACME HTTP-01 responder
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=oci-acme-http
+Group=oci-acme-challenge
+UMask=0027
+ExecStart=/opt/oci-acme-publisher/venv/bin/oci-acme-http01 serve --config /etc/oci-acme-publisher
+Restart=on-failure
+RestartSec=5s
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+LimitCORE=0
+TasksMax=128
+ReadOnlyPaths=/var/lib/oci-acme-http01
+InaccessiblePaths=/var/lib/oci-acme-publisher/acme /var/lib/oci-acme-publisher/certificates
+
+[Install]
+WantedBy=multi-user.target

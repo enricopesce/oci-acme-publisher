@@ -1,0 +1,840 @@
+{
+  "$defs": {
+    "AcmeConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "account_key_path": {
+          "title": "Account Key Path",
+          "type": "string"
+        },
+        "agree_to_terms": {
+          "title": "Agree To Terms",
+          "type": "boolean"
+        },
+        "certificates_dir": {
+          "title": "Certificates Dir",
+          "type": "string"
+        },
+        "directory_url": {
+          "title": "Directory Url",
+          "type": "string"
+        },
+        "email": {
+          "title": "Email",
+          "type": "string"
+        },
+        "operation_timeout_seconds": {
+          "default": 1800,
+          "maximum": 7200,
+          "minimum": 30,
+          "title": "Operation Timeout Seconds",
+          "type": "integer"
+        },
+        "preferred_profile": {
+          "anyOf": [
+            {
+              "const": "shortlived",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Preferred Profile"
+        },
+        "renew_before_days": {
+          "default": 30,
+          "maximum": 90,
+          "minimum": 1,
+          "title": "Renew Before Days",
+          "type": "integer"
+        },
+        "rotate_private_key_on_renewal": {
+          "default": true,
+          "title": "Rotate Private Key On Renewal",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "email",
+        "agree_to_terms",
+        "directory_url",
+        "account_key_path",
+        "certificates_dir"
+      ],
+      "title": "AcmeConfig",
+      "type": "object"
+    },
+    "AuditConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "automatic_rollback_on_failure": {
+          "default": false,
+          "title": "Automatic Rollback On Failure",
+          "type": "boolean"
+        },
+        "endpoints": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AuditEndpoint"
+          },
+          "title": "Endpoints",
+          "type": "array"
+        },
+        "mode": {
+          "$ref": "#/$defs/AuditMode",
+          "default": "observe"
+        },
+        "propagation_timeout_seconds": {
+          "default": 600,
+          "maximum": 3600,
+          "minimum": 0,
+          "title": "Propagation Timeout Seconds",
+          "type": "integer"
+        },
+        "reject_non_global_addresses": {
+          "default": true,
+          "title": "Reject Non Global Addresses",
+          "type": "boolean"
+        },
+        "require_all_addresses": {
+          "default": true,
+          "title": "Require All Addresses",
+          "type": "boolean"
+        },
+        "retry_interval_seconds": {
+          "default": 15,
+          "maximum": 300,
+          "minimum": 1,
+          "title": "Retry Interval Seconds",
+          "type": "integer"
+        }
+      },
+      "title": "AuditConfig",
+      "type": "object"
+    },
+    "AuditEndpoint": {
+      "additionalProperties": false,
+      "properties": {
+        "hostname": {
+          "title": "Hostname",
+          "type": "string"
+        },
+        "port": {
+          "maximum": 65535,
+          "minimum": 1,
+          "title": "Port",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "hostname",
+        "port"
+      ],
+      "title": "AuditEndpoint",
+      "type": "object"
+    },
+    "AuditMode": {
+      "description": "Endpoint audit behavior.",
+      "enum": [
+        "disabled",
+        "observe",
+        "enforce"
+      ],
+      "title": "AuditMode",
+      "type": "string"
+    },
+    "CertificateConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "audit": {
+          "$ref": "#/$defs/AuditConfig",
+          "default": {
+            "automatic_rollback_on_failure": false,
+            "endpoints": [],
+            "mode": "observe",
+            "propagation_timeout_seconds": 600,
+            "reject_non_global_addresses": true,
+            "require_all_addresses": true,
+            "retry_interval_seconds": 15
+          }
+        },
+        "chain": {
+          "$ref": "#/$defs/ChainConfig"
+        },
+        "common_name": {
+          "title": "Common Name",
+          "type": "string"
+        },
+        "domains": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Domains",
+          "type": "array"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9-]{0,62}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "key": {
+          "$ref": "#/$defs/KeyConfig"
+        },
+        "oci": {
+          "$ref": "#/$defs/CertificateOciConfig"
+        },
+        "retention": {
+          "$ref": "#/$defs/RetentionConfig",
+          "default": {
+            "deletion_delay_days": 30,
+            "enabled": true,
+            "keep_deprecated_versions": 2,
+            "minimum_age_days": 30
+          }
+        },
+        "webroot_id": {
+          "pattern": "^[a-z][a-z0-9-]{0,62}$",
+          "title": "Webroot Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "webroot_id",
+        "common_name",
+        "domains",
+        "key",
+        "chain",
+        "oci"
+      ],
+      "title": "CertificateConfig",
+      "type": "object"
+    },
+    "CertificateOciConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "certificate_name": {
+          "title": "Certificate Name",
+          "type": "string"
+        },
+        "certificate_ocid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Certificate Ocid"
+        },
+        "compartment_ocid": {
+          "title": "Compartment Ocid",
+          "type": "string"
+        },
+        "region": {
+          "title": "Region",
+          "type": "string"
+        }
+      },
+      "required": [
+        "region",
+        "compartment_ocid",
+        "certificate_name"
+      ],
+      "title": "CertificateOciConfig",
+      "type": "object"
+    },
+    "ChainConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_issuer_common_names": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Allowed Issuer Common Names",
+          "type": "array"
+        },
+        "allowed_root_sha256": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Allowed Root Sha256",
+          "type": "array"
+        },
+        "root_pem_path": {
+          "title": "Root Pem Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "root_pem_path",
+        "allowed_root_sha256",
+        "allowed_issuer_common_names"
+      ],
+      "title": "ChainConfig",
+      "type": "object"
+    },
+    "CompatibilityConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "enforce_documented_subject_country": {
+          "default": true,
+          "title": "Enforce Documented Subject Country",
+          "type": "boolean"
+        },
+        "live_evidence_paths": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Live Evidence Paths",
+          "type": "array"
+        },
+        "live_verified": {
+          "default": false,
+          "title": "Live Verified",
+          "type": "boolean"
+        },
+        "reject_mixed_algorithm_chain": {
+          "default": true,
+          "title": "Reject Mixed Algorithm Chain",
+          "type": "boolean"
+        },
+        "require_complete_chain_to_root": {
+          "default": true,
+          "title": "Require Complete Chain To Root",
+          "type": "boolean"
+        }
+      },
+      "title": "CompatibilityConfig",
+      "type": "object"
+    },
+    "Environment": {
+      "description": "ACME deployment environment.",
+      "enum": [
+        "production",
+        "staging"
+      ],
+      "title": "Environment",
+      "type": "string"
+    },
+    "GlobalConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "clock_skew_tolerance_seconds": {
+          "default": 300,
+          "maximum": 3600,
+          "minimum": 0,
+          "title": "Clock Skew Tolerance Seconds",
+          "type": "integer"
+        },
+        "environment": {
+          "$ref": "#/$defs/Environment"
+        },
+        "json_logging": {
+          "default": true,
+          "title": "Json Logging",
+          "type": "boolean"
+        },
+        "log_level": {
+          "default": "INFO",
+          "enum": [
+            "DEBUG",
+            "INFO",
+            "WARNING",
+            "ERROR"
+          ],
+          "title": "Log Level",
+          "type": "string"
+        },
+        "max_parallel_certificates": {
+          "default": 1,
+          "maximum": 16,
+          "minimum": 1,
+          "title": "Max Parallel Certificates",
+          "type": "integer"
+        },
+        "state_dir": {
+          "title": "State Dir",
+          "type": "string"
+        }
+      },
+      "required": [
+        "environment",
+        "state_dir"
+      ],
+      "title": "GlobalConfig",
+      "type": "object"
+    },
+    "Http01Config": {
+      "additionalProperties": false,
+      "properties": {
+        "responder": {
+          "$ref": "#/$defs/ResponderConfig"
+        },
+        "self_check": {
+          "$ref": "#/$defs/SelfCheckConfig"
+        },
+        "webroot_base": {
+          "title": "Webroot Base",
+          "type": "string"
+        }
+      },
+      "required": [
+        "webroot_base",
+        "responder",
+        "self_check"
+      ],
+      "title": "Http01Config",
+      "type": "object"
+    },
+    "KeyConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "ecdsa_curve": {
+          "anyOf": [
+            {
+              "enum": [
+                "secp256r1",
+                "secp384r1"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ecdsa Curve"
+        },
+        "rsa_size": {
+          "anyOf": [
+            {
+              "enum": [
+                2048,
+                4096
+              ],
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rsa Size"
+        },
+        "type": {
+          "$ref": "#/$defs/KeyType"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "KeyConfig",
+      "type": "object"
+    },
+    "KeyType": {
+      "description": "Initially supported private key families.",
+      "enum": [
+        "rsa",
+        "ecdsa"
+      ],
+      "title": "KeyType",
+      "type": "string"
+    },
+    "MetricsTextfileConfig": {
+      "additionalProperties": false,
+      "description": "Optional Prometheus node-exporter textfile target.",
+      "properties": {
+        "enabled": {
+          "default": false,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "path": {
+          "default": "/var/lib/oci-acme-publisher/metrics/oci_acme.prom",
+          "title": "Path",
+          "type": "string"
+        }
+      },
+      "title": "MetricsTextfileConfig",
+      "type": "object"
+    },
+    "MonitoringConfig": {
+      "additionalProperties": false,
+      "description": "Bounded operational monitoring policy with no remote credentials.",
+      "properties": {
+        "critical_days": {
+          "default": 7,
+          "maximum": 3650,
+          "minimum": 0,
+          "title": "Critical Days",
+          "type": "integer"
+        },
+        "metrics_textfile": {
+          "$ref": "#/$defs/MetricsTextfileConfig",
+          "default": {
+            "enabled": false,
+            "path": "/var/lib/oci-acme-publisher/metrics/oci_acme.prom"
+          }
+        },
+        "warning_days": {
+          "default": 20,
+          "maximum": 3650,
+          "minimum": 1,
+          "title": "Warning Days",
+          "type": "integer"
+        }
+      },
+      "title": "MonitoringConfig",
+      "type": "object"
+    },
+    "NotificationsConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_hosts": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Allowed Hosts",
+          "type": "array"
+        },
+        "connect_timeout_seconds": {
+          "default": 5,
+          "maximum": 60,
+          "minimum": 1,
+          "title": "Connect Timeout Seconds",
+          "type": "integer"
+        },
+        "credential_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Credential Ref"
+        },
+        "enabled": {
+          "default": false,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "minimum_repeat_interval_minutes": {
+          "default": 60,
+          "maximum": 1440,
+          "minimum": 1,
+          "title": "Minimum Repeat Interval Minutes",
+          "type": "integer"
+        },
+        "provider": {
+          "default": "slack",
+          "enum": [
+            "slack",
+            "webhook"
+          ],
+          "title": "Provider",
+          "type": "string"
+        },
+        "total_timeout_seconds": {
+          "default": 10,
+          "maximum": 120,
+          "minimum": 1,
+          "title": "Total Timeout Seconds",
+          "type": "integer"
+        }
+      },
+      "title": "NotificationsConfig",
+      "type": "object"
+    },
+    "OciConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "authentication": {
+          "const": "instance_principal",
+          "title": "Authentication",
+          "type": "string"
+        },
+        "connect_timeout_seconds": {
+          "default": 10,
+          "maximum": 60,
+          "minimum": 1,
+          "title": "Connect Timeout Seconds",
+          "type": "integer"
+        },
+        "max_read_attempts": {
+          "default": 5,
+          "maximum": 30,
+          "minimum": 1,
+          "title": "Max Read Attempts",
+          "type": "integer"
+        },
+        "mutation_reconciliation_attempts": {
+          "default": 5,
+          "maximum": 10,
+          "minimum": 1,
+          "title": "Mutation Reconciliation Attempts",
+          "type": "integer"
+        },
+        "operation_timeout_seconds": {
+          "default": 1200,
+          "maximum": 3600,
+          "minimum": 30,
+          "title": "Operation Timeout Seconds",
+          "type": "integer"
+        },
+        "read_timeout_seconds": {
+          "default": 60,
+          "maximum": 300,
+          "minimum": 1,
+          "title": "Read Timeout Seconds",
+          "type": "integer"
+        },
+        "use_etag": {
+          "const": true,
+          "default": true,
+          "title": "Use Etag",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "authentication"
+      ],
+      "title": "OciConfig",
+      "type": "object"
+    },
+    "ResponderConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "backlog": {
+          "default": 128,
+          "maximum": 1024,
+          "minimum": 1,
+          "title": "Backlog",
+          "type": "integer"
+        },
+        "bind_address": {
+          "title": "Bind Address",
+          "type": "string"
+        },
+        "bind_port": {
+          "maximum": 65535,
+          "minimum": 1,
+          "title": "Bind Port",
+          "type": "integer"
+        },
+        "health_path": {
+          "const": "/healthz",
+          "default": "/healthz",
+          "title": "Health Path",
+          "type": "string"
+        },
+        "keepalive_timeout_seconds": {
+          "default": 5,
+          "maximum": 60,
+          "minimum": 1,
+          "title": "Keepalive Timeout Seconds",
+          "type": "integer"
+        },
+        "max_challenge_file_bytes": {
+          "default": 4096,
+          "maximum": 4096,
+          "minimum": 1,
+          "title": "Max Challenge File Bytes",
+          "type": "integer"
+        },
+        "max_concurrent_requests": {
+          "default": 128,
+          "maximum": 1024,
+          "minimum": 1,
+          "title": "Max Concurrent Requests",
+          "type": "integer"
+        },
+        "max_request_body_bytes": {
+          "default": 1024,
+          "maximum": 1024,
+          "minimum": 0,
+          "title": "Max Request Body Bytes",
+          "type": "integer"
+        },
+        "readiness_path": {
+          "const": "/readyz",
+          "default": "/readyz",
+          "title": "Readiness Path",
+          "type": "string"
+        },
+        "request_timeout_seconds": {
+          "default": 5,
+          "maximum": 60,
+          "minimum": 1,
+          "title": "Request Timeout Seconds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "bind_address",
+        "bind_port"
+      ],
+      "title": "ResponderConfig",
+      "type": "object"
+    },
+    "RetentionConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "deletion_delay_days": {
+          "default": 30,
+          "maximum": 3650,
+          "minimum": 1,
+          "title": "Deletion Delay Days",
+          "type": "integer"
+        },
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "keep_deprecated_versions": {
+          "default": 2,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Keep Deprecated Versions",
+          "type": "integer"
+        },
+        "minimum_age_days": {
+          "default": 30,
+          "maximum": 3650,
+          "minimum": 0,
+          "title": "Minimum Age Days",
+          "type": "integer"
+        }
+      },
+      "title": "RetentionConfig",
+      "type": "object"
+    },
+    "SelfCheckConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "allow_redirects": {
+          "default": false,
+          "title": "Allow Redirects",
+          "type": "boolean"
+        },
+        "connect_timeout_seconds": {
+          "default": 3,
+          "maximum": 60,
+          "minimum": 1,
+          "title": "Connect Timeout Seconds",
+          "type": "integer"
+        },
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "reject_non_global_addresses": {
+          "default": true,
+          "title": "Reject Non Global Addresses",
+          "type": "boolean"
+        },
+        "require_all_addresses": {
+          "default": true,
+          "title": "Require All Addresses",
+          "type": "boolean"
+        },
+        "require_all_domains": {
+          "default": true,
+          "title": "Require All Domains",
+          "type": "boolean"
+        },
+        "response_timeout_seconds": {
+          "default": 5,
+          "maximum": 60,
+          "minimum": 1,
+          "title": "Response Timeout Seconds",
+          "type": "integer"
+        },
+        "total_timeout_seconds": {
+          "default": 90,
+          "maximum": 600,
+          "minimum": 1,
+          "title": "Total Timeout Seconds",
+          "type": "integer"
+        }
+      },
+      "title": "SelfCheckConfig",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "acme": {
+      "$ref": "#/$defs/AcmeConfig"
+    },
+    "certificates": {
+      "items": {
+        "$ref": "#/$defs/CertificateConfig"
+      },
+      "title": "Certificates",
+      "type": "array"
+    },
+    "compatibility": {
+      "$ref": "#/$defs/CompatibilityConfig"
+    },
+    "global": {
+      "$ref": "#/$defs/GlobalConfig"
+    },
+    "http01": {
+      "$ref": "#/$defs/Http01Config"
+    },
+    "monitoring": {
+      "$ref": "#/$defs/MonitoringConfig",
+      "default": {
+        "critical_days": 7,
+        "metrics_textfile": {
+          "enabled": false,
+          "path": "/var/lib/oci-acme-publisher/metrics/oci_acme.prom"
+        },
+        "warning_days": 20
+      }
+    },
+    "notifications": {
+      "$ref": "#/$defs/NotificationsConfig",
+      "default": {
+        "allowed_hosts": [],
+        "connect_timeout_seconds": 5,
+        "credential_ref": null,
+        "enabled": false,
+        "minimum_repeat_interval_minutes": 60,
+        "provider": "slack",
+        "total_timeout_seconds": 10
+      }
+    },
+    "oci": {
+      "$ref": "#/$defs/OciConfig"
+    },
+    "schema_version": {
+      "const": 4,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "schema_version",
+    "global",
+    "compatibility",
+    "acme",
+    "http01",
+    "oci",
+    "certificates"
+  ],
+  "title": "AppConfig",
+  "type": "object"
+}

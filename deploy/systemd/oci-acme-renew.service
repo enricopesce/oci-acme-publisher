@@ -1,0 +1,35 @@
+[Unit]
+Description=OCI ACME certificate renewal and publication
+Wants=network-online.target time-sync.target
+After=network-online.target time-sync.target
+
+[Service]
+Type=oneshot
+User=oci-acme-publisher
+Group=oci-acme-publisher
+SupplementaryGroups=oci-acme-challenge
+UMask=0027
+ExecStart=/opt/oci-acme-publisher/venv/bin/oci-acme-publisher renew --config /etc/oci-acme-publisher
+TimeoutStartSec=35min
+RestartPreventExitStatus=75
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+LimitCORE=0
+TasksMax=256
+ReadWritePaths=/var/lib/oci-acme-publisher /var/lib/oci-acme-http01 /var/log/oci-acme-publisher /run/oci-acme-publisher

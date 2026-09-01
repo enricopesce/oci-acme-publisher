@@ -1,0 +1,65 @@
+schema_version: 4
+global:
+  environment: production
+  state_dir: /var/lib/oci-acme-publisher
+  log_level: INFO
+  json_logging: true
+  max_parallel_certificates: 1
+  clock_skew_tolerance_seconds: 300
+compatibility:
+  # Set to true only after retaining a successful live Gate 0 report.
+  live_verified: false
+  enforce_documented_subject_country: true
+  require_complete_chain_to_root: true
+  reject_mixed_algorithm_chain: true
+acme:
+  email: admin@example.com
+  agree_to_terms: true
+  directory_url: https://acme-v02.api.letsencrypt.org/directory
+  account_key_path: /var/lib/oci-acme-publisher/acme/account.key
+  certificates_dir: /var/lib/oci-acme-publisher/certificates
+  operation_timeout_seconds: 1800
+  renew_before_days: 30
+  rotate_private_key_on_renewal: true
+  # Use shortlived only when the selected ACME directory advertises that profile.
+  preferred_profile: null
+http01:
+  webroot_base: /var/lib/oci-acme-http01/webroots
+  responder:
+    bind_address: 10.0.1.25
+    bind_port: 8080
+  self_check: {}
+oci:
+  authentication: instance_principal
+monitoring:
+  warning_days: 20
+  critical_days: 7
+  metrics_textfile:
+    enabled: false
+    path: /var/lib/oci-acme-publisher/metrics/oci_acme.prom
+certificates:
+  - id: main-site
+    webroot_id: main-site
+    # Multiple exact DNS SANs are supported. Wildcards are rejected because
+    # this product uses HTTP-01; wildcard issuance requires DNS-01.
+    common_name: example.com
+    domains: [example.com, www.example.com]
+    key:
+      type: rsa
+      rsa_size: 2048
+    chain:
+      root_pem_path: /etc/oci-acme-publisher/roots/isrg-root-x1.pem
+      allowed_root_sha256: ["0000000000000000000000000000000000000000000000000000000000000000"]
+      allowed_issuer_common_names: ["Example Issuer"]
+    oci:
+      region: eu-frankfurt-1
+      compartment_ocid: ocid1.compartment.oc1..example
+      certificate_ocid: ocid1.certificate.oc1.eu-frankfurt-1.example
+      certificate_name: main-site
+    audit:
+      mode: observe
+      automatic_rollback_on_failure: false
+      endpoints:
+        - hostname: example.com
+          port: 443
+    retention: {}

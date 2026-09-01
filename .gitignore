@@ -1,0 +1,26 @@
+# Local Python tooling and test output
+.coverage
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.venv/
+__pycache__/
+*.py[cod]
+.agents/
+.codex/
+
+# Build output
+dist/*
+!dist/.gitignore
+build/
+*.egg-info/
+
+# Deployment-specific configuration, evidence, and operational records.
+# Public users should start from config/config.example.yaml.
+config/production/
+config/evidence/
+config/oci.enricopesce.it.milan.staging.yaml
+config/oci.enricopesce.it.milan.standard.yaml
+docs/compatibility-gate-report-*.md
+docs/production-promotion-*.md
+docs/current-project-state.md
